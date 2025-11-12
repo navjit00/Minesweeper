@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.helper.widget.Grid
 import kotlin.random.Random
 import android.graphics.Color
+import android.widget.Toast
 
 class Game2 : AppCompatActivity() {
 
@@ -37,6 +38,15 @@ class Game2 : AppCompatActivity() {
         gridl = Array(size){Array(size){Button(this) }}
         mines = Array(size) { Array(size) { false } }
         fillmine(mine)
+        check()
+
+
+        //Initiialisieren Punkte Array
+        for(i in punkte.indices){
+            for( j in punkte[i].indices){
+                punkte[i][j] = 0
+            }
+        }
 
         for (i in 0 until size) {
             for (j in 0 until size) {
@@ -79,15 +89,51 @@ class Game2 : AppCompatActivity() {
             Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show()
             disableAll()
         } else {
-            val count = check(x, y)
+            val count = punkte[x][y]
             button.text = if (count > 0) "$count" else ""
             button.isEnabled = false
             button.setBackgroundColor(Color.LTGRAY)
         }
     }
 
-    fun check(x: Int,y: Int){
+    fun check(){
 
+        for(i in mines.indices){
+            for( j in mines[i].indices){
+                if(mines[i][j]){
+                    for (k in -1..1){
+                        if(i-k>=0 && (i-k) <= mines.count()){
+                            punkte[i][j]++;
+                        }
+                    }
+                    for (k in -1..1){
+                        if(j-k>=0 && (j-k) <= mines.count()){
+                            punkte[i][j]++;
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    fun disableAll(){
+
+        for(i in mines.indices){
+            for( y in mines[i].indices){
+                if (mines[i][y]) {
+                    gridl[i][y].text = "💣"
+                    gridl[i][y].isEnabled = false
+                }
+                    else{
+                    val count = punkte[i][y]
+                    gridl[i][y].text = if (count > 0) "$count" else ""
+                    gridl[i][y].isEnabled = false
+                    }
+            }
+        }
     }
 }
 
