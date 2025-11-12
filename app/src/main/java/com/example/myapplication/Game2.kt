@@ -79,7 +79,7 @@ class Game2 : AppCompatActivity() {
             Toast.makeText(this, "Game Over!", Toast.LENGTH_SHORT).show()
             disableAll()
         } else {
-            val count = countAdjacentMines(x, y)
+            val count = check(x, y)
             button.text = if (count > 0) "$count" else ""
             button.isEnabled = false
             button.setBackgroundColor(Color.LTGRAY)
