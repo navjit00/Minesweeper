@@ -1,12 +1,10 @@
 package com.example.myapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.helper.widget.Grid
 import kotlin.random.Random
 import android.graphics.Color
 import android.widget.Toast
@@ -14,39 +12,32 @@ import android.widget.Toast
 class Game2 : AppCompatActivity() {
 
     private var mine = 2
-    private var size= 3
+    private var size = 3
 
-    private lateinit var tvin : TextView
-    private lateinit var gridl : Array<Array<Button>>
-    private lateinit var mines : Array<Array<Boolean>>
-
-    private lateinit var punkte : Array<Array<Int>>
+    private lateinit var tvin: TextView
+    private lateinit var gridl: Array<Array<Button>>
+    private lateinit var mines: Array<Array<Boolean>>
+    private lateinit var punkte: Array<Array<Int>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        size = intent.getIntExtra("size",3);
-        mine = intent.getIntExtra("mine",2);
+        size = intent.getIntExtra("size", 3)
+        mine = intent.getIntExtra("mine", 2)
 
-        var grid = findViewById<GridLayout>(R.id.gridLayout)
-        var tvin= findViewById<TextView>(R.id.tvStatus)
+        val grid = findViewById<GridLayout>(R.id.gridLayout)
+        tvin = findViewById(R.id.tvStatus)
 
         grid.columnCount = size
         grid.rowCount = size
 
-        gridl = Array(size){Array(size){Button(this) }}
+        gridl = Array(size) { Array(size) { Button(this) } }
         mines = Array(size) { Array(size) { false } }
+        punkte = Array(size) { Array(size) { 0 } }
+
         fillmine(mine)
         check()
-
-
-        //Initiialisieren Punkte Array
-        for(i in punkte.indices){
-            for( j in punkte[i].indices){
-                punkte[i][j] = 0
-            }
-        }
 
         for (i in 0 until size) {
             for (j in 0 until size) {
@@ -63,23 +54,21 @@ class Game2 : AppCompatActivity() {
                 grid.addView(button)
             }
         }
-
     }
 
-    fun fillmine(temp : Int){
-        repeat(temp){
-            var x=0
-            var y=0
+    fun fillmine(temp: Int) {
+        repeat(temp) {
+            var x: Int
+            var y: Int
             do {
-                x = Random.nextInt(size);
-                y = Random.nextInt(size);
-            }while (mines[x][y])
-            mines[x][y]=true
+                x = Random.nextInt(size)
+                y = Random.nextInt(size)
+            } while (mines[x][y])
+            mines[x][y] = true
         }
     }
 
-
-     private fun reveal(x: Int, y: Int) {
+    private fun reveal(x: Int, y: Int) {
         val button = gridl[x][y]
 
         if (mines[x][y]) {
@@ -96,60 +85,41 @@ class Game2 : AppCompatActivity() {
         }
     }
 
-    fun check(){
+    fun check() {
+        for (i in 0 until size) {
+            for (j in 0 until size) {
+                if (mines[i][j]) continue
 
-        for(i in mines.indices){
-            for( j in mines[i].indices){
-                if(mines[i][j]){
-                    for (k in -1..1){
-                        if(i-k>=0 && (i-k) <= mines.count()){
-                            punkte[i][j]++;
+                var count = 0
+
+                for (dx in -1..1) {
+                    for (dy in -1..1) {
+                        val nx = i + dx
+                        val ny = j + dy
+
+                        if (nx in 0 until size && ny in 0 until size) {
+                            if (mines[nx][ny]) count++
                         }
                     }
-                    for (k in -1..1){
-                        if(j-k>=0 && (j-k) <= mines.count()){
-                            punkte[i][j]++;
-                        }
-                    }
-
                 }
 
+                punkte[i][j] = count
             }
         }
-
     }
 
-    fun disableAll(){
-
-        for(i in mines.indices){
-            for( y in mines[i].indices){
-                if (mines[i][y]) {
-                    gridl[i][y].text = "💣"
-                    gridl[i][y].isEnabled = false
+    fun disableAll() {
+        for (i in 0 until size) {
+            for (j in 0 until size) {
+                val btn = gridl[i][j]
+                if (mines[i][j]) {
+                    btn.text = "💣"
+                } else {
+                    val count = punkte[i][j]
+                    btn.text = if (count > 0) "$count" else ""
                 }
-                    else{
-                    val count = punkte[i][y]
-                    gridl[i][y].text = if (count > 0) "$count" else ""
-                    gridl[i][y].isEnabled = false
-                    }
+                btn.isEnabled = false
             }
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
